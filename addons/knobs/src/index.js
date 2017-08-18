@@ -50,6 +50,10 @@ export function select(name, options, value) {
   return manager.knob(name, { type: 'select', options, value });
 }
 
+export function sortable(name, options, value) {
+  return manager.knob(name, { type: 'sortable', options, value });
+}
+
 export function array(name, value, separator = ',') {
   return manager.knob(name, { type: 'array', value, separator });
 }
