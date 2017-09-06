@@ -14,6 +14,10 @@ export function text(name, value) {
   return manager.knob(name, { type: 'text', value });
 }
 
+export function code(name, value, mode) {
+  return manager.knob(name, { type: 'code', value, mode });
+}
+
 export function boolean(name, value) {
   return manager.knob(name, { type: 'boolean', value });
 }
