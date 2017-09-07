@@ -6,6 +6,9 @@ link:
 	cd ../../addons/links ; yarn link
 	yarn link @storybook/addon-links
 
+	cd ../../addons/knobs ; yarn link
+	yarn link @storybook/addon-knobs
+
 	cd ../../lib/addons ; yarn link ;
 	yarn link @storybook/addons
 

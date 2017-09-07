@@ -1,21 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Textarea from 'react-textarea-autosize';
+import CodeMirror from 'react-codemirror';
 import deepEqual from 'deep-equal';
+import insertCss from 'insert-css';
 
-const styles = {
-  display: 'table-cell',
-  boxSizing: 'border-box',
-  verticalAlign: 'middle',
-  width: '100%',
-  outline: 'none',
-  border: '1px solid #f7f4f4',
-  borderRadius: 2,
-  fontSize: 11,
-  padding: '5px',
-  color: '#555',
-  fontFamily: 'monospace',
-};
+import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/lib/codemirror.css';
+
+const customStyle = `
+.CodeMirror__jsonError {
+  border: 1px solid #fadddd;
+  backgroundColor: #fff5f5;
+}
+`;
+insertCss(customStyle);
 
 class ObjectType extends React.Component {
   constructor(...args) {
@@ -39,14 +37,14 @@ class ObjectType extends React.Component {
     return JSON.stringify(knob.value, null, 2);
   }
 
-  handleChange(e) {
+  handleChange(value) {
     const { onChange } = this.props;
     const newState = {
-      jsonString: e.target.value,
+      jsonString: value,
     };
 
     try {
-      newState.json = JSON.parse(e.target.value.trim());
+      newState.json = JSON.parse(value.trim());
       onChange(newState.json);
       this.failed = false;
     } catch (err) {
@@ -59,22 +57,17 @@ class ObjectType extends React.Component {
   render() {
     const { knob } = this.props;
     const jsonString = this.getJSONString();
-    const extraStyle = {};
-
-    if (this.failed) {
-      extraStyle.border = '1px solid #fadddd';
-      extraStyle.backgroundColor = '#fff5f5';
-    }
 
     return (
-      <Textarea
+      <CodeMirror
+        className={this.failed ? 'CodeMirror__jsonError' : null}
         id={knob.name}
         ref={c => {
           this.input = c;
         }}
-        style={{ ...styles, ...extraStyle }}
         value={jsonString}
-        onChange={e => this.handleChange(e)}
+        onChange={value => this.handleChange(value)}
+        options={{ mode: 'javascript' }}
       />
     );
   }
