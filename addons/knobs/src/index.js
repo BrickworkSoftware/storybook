@@ -4,7 +4,7 @@ import KnobManager from './KnobManager';
 import { vueHandler } from './vue';
 import { reactHandler } from './react';
 
-const manager = new KnobManager();
+export const manager = new KnobManager();
 
 export function knob(name, options) {
   return manager.knob(name, options);

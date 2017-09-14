@@ -4,70 +4,77 @@ import CodeMirror from 'react-codemirror';
 import deepEqual from 'deep-equal';
 import insertCss from 'insert-css';
 
-import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 
 const customStyle = `
-.CodeMirror__jsonError {
+.CodeMirror__error {
   border: 1px solid #fadddd;
   backgroundColor: #fff5f5;
 }
 `;
 insertCss(customStyle);
 
+function getJSONString(valueObject) {
+  return JSON.stringify(valueObject, null, 2);
+}
+
 class ObjectType extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.state = {};
-  }
-
-  getJSONString() {
-    const { json, jsonString } = this.state;
-    const { knob } = this.props;
-
-    // If there is an error in the JSON, we need to give that errored JSON.
-    if (this.failed) return jsonString;
-
-    // If the editor value and the knob value is the same, we need to return the
-    // editor value as it allow user to add new fields to the JSON.
-    if (deepEqual(json, knob.value)) return jsonString;
-
-    // If the knob's value is different from the editor, it seems like
-    // there's a outside change and we need to get that.
-    return JSON.stringify(knob.value, null, 2);
-  }
-
-  handleChange(value) {
-    const { onChange } = this.props;
-    const newState = {
-      jsonString: value,
+  constructor(props) {
+    super(props);
+    this.state = {
+      key: 0,
+      jsonString: getJSONString(props.knob.value),
+      value: props.knob.value,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { value } = this.state;
+
+    if (!deepEqual(value, nextProps.knob.value)) {
+      this.setState({
+        jsonString: getJSONString(nextProps.knob.value),
+        value: nextProps.knob.value,
+        key: this.state.key + 1,
+      });
+    }
+  }
+
+  handleChange = valueString => {
+    const { onChange } = this.props;
 
     try {
-      newState.json = JSON.parse(value.trim());
-      onChange(newState.json);
-      this.failed = false;
+      const value = JSON.parse(valueString.trim());
+      this.setState({
+        value,
+        jsonString: getJSONString(value),
+        failed: false,
+      });
+      onChange(value);
     } catch (err) {
-      this.failed = true;
+      this.setState({
+        failed: true,
+      });
     }
-
-    this.setState(newState);
-  }
+  };
 
   render() {
     const { knob } = this.props;
-    const jsonString = this.getJSONString();
+
+    const { failed, jsonString, key } = this.state;
 
     return (
       <CodeMirror
-        className={this.failed ? 'CodeMirror__jsonError' : null}
-        id={knob.name}
+        key={key}
+        className={failed ? 'CodeMirror CodeMirror__error' : 'CodeMirror'}
+        id={knob.key}
         ref={c => {
           this.input = c;
         }}
         value={jsonString}
-        onChange={value => this.handleChange(value)}
-        options={{ mode: 'javascript' }}
+        onChange={this.handleChange}
+        options={{ mode: { name: 'javascript', json: true } }}
       />
     );
   }
@@ -80,7 +87,7 @@ ObjectType.defaultProps = {
 
 ObjectType.propTypes = {
   knob: PropTypes.shape({
-    name: PropTypes.string,
+    name: PropTypes.any,
     value: PropTypes.object,
   }),
   onChange: PropTypes.func,

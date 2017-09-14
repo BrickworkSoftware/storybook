@@ -8,6 +8,14 @@ export default class KnobStore {
     return this.store[key] !== undefined;
   }
 
+  setAll(knobsByKey) {
+    this.store = {
+      ...this.store,
+      ...knobsByKey,
+    };
+    this.callbacks.forEach(cb => cb());
+  }
+
   set(key, value) {
     this.store[key] = value;
     this.store[key].used = true;
