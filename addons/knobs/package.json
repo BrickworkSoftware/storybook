@@ -1,6 +1,6 @@
 {
-  "name": "@morgs32/addon-knobs",
-  "version": "1.0.22",
+  "name": "@brickwork-software/addon-knobs",
+  "version": "1.0.4",
   "description": "Storybook Addon Prop Editor Component",
   "license": "MIT",
   "main": "dist/index.js",
