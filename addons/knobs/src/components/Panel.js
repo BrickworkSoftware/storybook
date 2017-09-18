@@ -44,6 +44,7 @@ const styles = {
 export default class Panel extends React.Component {
   constructor(props) {
     super(props);
+    this.handleLinkedLabel = this.handleLinkedLabel.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.setKnobs = this.setKnobs.bind(this);
     this.reset = this.reset.bind(this);
@@ -92,6 +93,10 @@ export default class Panel extends React.Component {
     this.props.channel.emit('addon:knobs:knobChange', changedKnob);
   }
 
+  handleLinkedLabel(selection) {
+    this.props.api.selectStory(selection.kind, selection.story);
+  }
+
   handleChange(changedKnob) {
     this.lastEdit = getTimestamp();
     const { knobs } = this.state;
@@ -107,7 +112,9 @@ export default class Panel extends React.Component {
 
   render() {
     const { knobs } = this.state;
-    const knobsArray = Object.keys(knobs).filter(key => knobs[key].used).map(key => knobs[key]);
+    const knobsArray = Object.keys(knobs)
+      .filter(key => knobs[key].used)
+      .map(key => knobs[key]);
 
     if (knobsArray.length === 0) {
       return <div style={styles.noKnobs}>NO KNOBS</div>;
@@ -116,7 +123,11 @@ export default class Panel extends React.Component {
     return (
       <div style={styles.panelWrapper}>
         <div style={styles.panel}>
-          <PropForm knobs={knobsArray} onFieldChange={this.handleChange} />
+          <PropForm
+            knobs={knobsArray}
+            onLinkedLabelClick={this.handleLinkedLabel}
+            onFieldChange={this.handleChange}
+          />
         </div>
         <button style={styles.resetButton} onClick={this.reset}>
           RESET
@@ -135,6 +146,7 @@ Panel.propTypes = {
   onReset: PropTypes.object, // eslint-disable-line
   api: PropTypes.shape({
     onStory: PropTypes.func,
+    selectStory: PropTypes.func,
     getQueryParam: PropTypes.func,
     setQueryParams: PropTypes.func,
   }).isRequired,

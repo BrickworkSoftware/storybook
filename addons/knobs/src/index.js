@@ -15,7 +15,11 @@ export function text(name, value) {
 }
 
 export function code(name, value, mode) {
-  return manager.knob(name, { type: 'code', value, mode });
+  return manager.knob(name, {
+    type: 'code',
+    value,
+    mode,
+  });
 }
 
 export function boolean(name, value) {
@@ -45,8 +49,12 @@ export function color(name, value) {
   return manager.knob(name, { type: 'color', value });
 }
 
-export function object(name, value) {
-  return manager.knob(name, { type: 'object', value });
+export function object(name, options, value) {
+  return manager.knob(name, {
+    ...options,
+    type: 'object',
+    value,
+  });
 }
 
 export function select(name, options, value) {
