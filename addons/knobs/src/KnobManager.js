@@ -1,5 +1,4 @@
 /* eslint no-underscore-dangle: 0 */
-import deepEqual from 'deep-equal';
 import KnobStore from './KnobStore';
 
 // This is used by _mayCallChannel to determine how long to wait to before triggering a panel update
@@ -15,16 +14,17 @@ export default class KnobManager {
   }
 
   knob(name, options) {
-    this._mayCallChannel();
-
     const knobStore = this.knobStore;
     const existingKnob = knobStore.get(name);
+
     // We need to return the value set by the knob editor via this.
     // But, if the user changes the code for the defaultValue we should set
     // that value instead.
-    if (existingKnob && deepEqual(options.value, existingKnob.defaultValue)) {
+    if (existingKnob) {
       return existingKnob.value;
     }
+
+    this._mayCallChannel();
 
     const defaultValue = options.value;
     const knobInfo = {

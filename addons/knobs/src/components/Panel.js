@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
 import PropForm from './PropForm';
-import Types from './types';
 
 const getTimestamp = () => +new Date();
 
@@ -45,6 +44,7 @@ const styles = {
 export default class Panel extends React.Component {
   constructor(props) {
     super(props);
+    this.handleLinkedLabel = this.handleLinkedLabel.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.setKnobs = this.setKnobs.bind(this);
     this.reset = this.reset.bind(this);
@@ -80,27 +80,7 @@ export default class Panel extends React.Component {
   }
 
   setKnobs({ knobs, timestamp }) {
-    const queryParams = {};
-    const { api, channel } = this.props;
-
     if (!this.options.timestamps || !timestamp || this.lastEdit <= timestamp) {
-      Object.keys(knobs).forEach(name => {
-        const knob = knobs[name];
-        // For the first time, get values from the URL and set them.
-        if (!this.loadedFromUrl) {
-          const urlValue = api.getQueryParam(`knob-${name}`);
-
-          if (urlValue !== undefined) {
-            // If the knob value present in url
-            knob.value = Types[knob.type].deserialize(urlValue);
-            channel.emit('addon:knobs:knobChange', knob);
-          }
-        }
-
-        queryParams[`knob-${name}`] = Types[knob.type].serialize(knob.value);
-      });
-      this.loadedFromUrl = true;
-      api.setQueryParams(queryParams);
       this.setState({ knobs });
     }
   }
@@ -113,29 +93,28 @@ export default class Panel extends React.Component {
     this.props.channel.emit('addon:knobs:knobChange', changedKnob);
   }
 
+  handleLinkedLabel(selection) {
+    this.props.api.selectStory(selection.kind, selection.story);
+  }
+
   handleChange(changedKnob) {
     this.lastEdit = getTimestamp();
-    const { api } = this.props;
     const { knobs } = this.state;
-    const { name, type, value } = changedKnob;
+    const { name } = changedKnob;
     const newKnobs = { ...knobs };
     newKnobs[name] = {
       ...newKnobs[name],
       ...changedKnob,
     };
 
-    this.setState({ knobs: newKnobs });
-
-    const queryParams = {};
-    queryParams[`knob-${name}`] = Types[type].serialize(value);
-
-    api.setQueryParams(queryParams);
     this.setState({ knobs: newKnobs }, this.emitChange(changedKnob));
   }
 
   render() {
     const { knobs } = this.state;
-    const knobsArray = Object.keys(knobs).filter(key => knobs[key].used).map(key => knobs[key]);
+    const knobsArray = Object.keys(knobs)
+      .filter(key => knobs[key].used)
+      .map(key => knobs[key]);
 
     if (knobsArray.length === 0) {
       return <div style={styles.noKnobs}>NO KNOBS</div>;
@@ -144,7 +123,11 @@ export default class Panel extends React.Component {
     return (
       <div style={styles.panelWrapper}>
         <div style={styles.panel}>
-          <PropForm knobs={knobsArray} onFieldChange={this.handleChange} />
+          <PropForm
+            knobs={knobsArray}
+            onLinkedLabelClick={this.handleLinkedLabel}
+            onFieldChange={this.handleChange}
+          />
         </div>
         <button style={styles.resetButton} onClick={this.reset}>
           RESET
@@ -163,6 +146,7 @@ Panel.propTypes = {
   onReset: PropTypes.object, // eslint-disable-line
   api: PropTypes.shape({
     onStory: PropTypes.func,
+    selectStory: PropTypes.func,
     getQueryParam: PropTypes.func,
     setQueryParams: PropTypes.func,
   }).isRequired,

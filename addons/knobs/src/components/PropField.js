@@ -11,6 +11,11 @@ const stylesheet = {
     display: 'table-row',
     padding: '5px',
   },
+  link: {
+    cursor: 'pointer',
+    color: 'blue',
+    textDecoration: 'underline',
+  },
   label: {
     display: 'table-cell',
     boxSizing: 'border-box',
@@ -45,6 +50,28 @@ export default class PropField extends React.Component {
     this.props.onChange(e.target.value);
   }
 
+  renderLabel(knob) {
+    const linkTo = knob.linkTo;
+    if (linkTo && linkTo.kind && linkTo.story) {
+      const handleLinkedLabel = () => {
+        this.props.onLinkedLabelClick(linkTo);
+      };
+
+      return (
+        <label htmlFor={linkTo.story} style={stylesheet.label}>
+          <div tabIndex={0} role="button" style={stylesheet.link} onClick={handleLinkedLabel}>
+            {knob.name}
+          </div>
+        </label>
+      );
+    }
+    return (
+      <label htmlFor={knob.name} style={stylesheet.label}>
+        {knob.name}
+      </label>
+    );
+  }
+
   render() {
     const { onChange, knob } = this.props;
 
@@ -52,9 +79,7 @@ export default class PropField extends React.Component {
 
     return (
       <div style={stylesheet.field}>
-        <label htmlFor={knob.name} style={stylesheet.label}>
-          {`${knob.name}`}
-        </label>
+        {this.renderLabel(knob)}
         <InputType knob={knob} onChange={onChange} />
       </div>
     );
@@ -63,8 +88,16 @@ export default class PropField extends React.Component {
 
 PropField.propTypes = {
   knob: PropTypes.shape({
+    linkTo: PropTypes.oneOfType([
+      PropTypes.shape({
+        kind: PropTypes.string,
+        story: PropTypes.string,
+      }),
+      PropTypes.string,
+    ]),
     name: PropTypes.string,
     value: PropTypes.any,
   }).isRequired,
+  onLinkedLabelClick: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
 };

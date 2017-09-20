@@ -23,11 +23,16 @@ export default class propForm extends React.Component {
   constructor() {
     super();
     this._onFieldChange = this.onFieldChange.bind(this);
+    this.handleLinkedLabel = this.handleLinkedLabel.bind(this);
   }
 
   onFieldChange(name, type, value) {
     const change = { name, type, value };
     this.props.onFieldChange(change);
+  }
+
+  handleLinkedLabel(selection) {
+    this.props.onLinkedLabelClick(selection);
   }
 
   render() {
@@ -45,6 +50,7 @@ export default class propForm extends React.Component {
               type={knob.type}
               value={knob.value}
               knob={knob}
+              onLinkedLabelClick={this.handleLinkedLabel}
               onChange={changeHandler}
             />
           );
@@ -67,5 +73,6 @@ propForm.propTypes = {
       value: PropTypes.any,
     })
   ),
+  onLinkedLabelClick: PropTypes.func.isRequired,
   onFieldChange: PropTypes.func.isRequired,
 };
