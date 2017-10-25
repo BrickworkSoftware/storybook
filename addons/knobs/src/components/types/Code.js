@@ -35,6 +35,7 @@ class CodeType extends React.Component {
 
   render() {
     const { knob } = this.props;
+    const { readOnly = false, lineNumbers = false } = knob;
 
     return (
       <CodeMirror
@@ -42,7 +43,7 @@ class CodeType extends React.Component {
         key={this.key}
         value={knob.value}
         onChange={this.handleChange}
-        options={{ mode: knob.mode }}
+        options={{ mode: knob.mode, readOnly, lineNumbers }}
       />
     );
   }

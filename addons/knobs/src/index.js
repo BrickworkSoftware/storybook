@@ -57,6 +57,14 @@ export function object(name, options, value) {
   });
 }
 
+export function yaml(name, options, value) {
+  return manager.knob(name, {
+    ...options,
+    type: 'yaml',
+    value,
+  });
+}
+
 export function select(name, options, value) {
   return manager.knob(name, { type: 'select', options, value });
 }

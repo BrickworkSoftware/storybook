@@ -3,6 +3,7 @@ import NumberType from './Number';
 import ColorType from './Color';
 import BooleanType from './Boolean';
 import ObjectType from './Object';
+import YamlType from './Yaml';
 import SelectType from './Select';
 import ArrayType from './Array';
 import DateType from './Date';
@@ -14,6 +15,7 @@ export default {
   color: ColorType,
   boolean: BooleanType,
   object: ObjectType,
+  yaml: YamlType,
   select: SelectType,
   array: ArrayType,
   date: DateType,
