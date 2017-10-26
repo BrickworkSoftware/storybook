@@ -3,8 +3,10 @@ import React from 'react';
 import CodeMirror from 'react-codemirror';
 import deepEqual from 'deep-equal';
 import insertCss from 'insert-css';
+import yaml from 'js-yaml';
+import _mapValues from 'lodash/mapValues';
 
-import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/yaml/yaml';
 import 'codemirror/lib/codemirror.css';
 
 const customStyle = `
@@ -15,8 +17,11 @@ const customStyle = `
 `;
 insertCss(customStyle);
 
-function getJSONString(valueObject) {
-  return JSON.stringify(valueObject, null, 2);
+function yamlStringify(valueObject) {
+  return yaml.safeDump(valueObject);
+}
+function yamlParse(valueObject) {
+  return yaml.safeLoad(valueObject);
 }
 
 class ObjectType extends React.Component {
@@ -24,8 +29,9 @@ class ObjectType extends React.Component {
     super(props);
     this.state = {
       key: 0,
-      jsonString: getJSONString(props.knob.value),
+      yamlString: yamlStringify(props.knob.value),
       value: props.knob.value,
+      propTypes: _mapValues(props.knob.value, optionValue => typeof optionValue),
     };
   }
 
@@ -34,7 +40,7 @@ class ObjectType extends React.Component {
 
     if (!deepEqual(value, nextProps.knob.value)) {
       this.setState({
-        jsonString: getJSONString(nextProps.knob.value),
+        yamlString: yamlStringify(nextProps.knob.value),
         value: nextProps.knob.value,
         key: this.state.key + 1,
       });
@@ -44,11 +50,21 @@ class ObjectType extends React.Component {
   handleChange = valueString => {
     const { onChange } = this.props;
 
+    const { propTypes } = this.state;
+
     try {
-      const value = JSON.parse(valueString.trim());
+      const value = yamlParse(valueString.trim());
+      /* eslint-disable valid-typeof */
+      const divergentKeys = Object.keys(value).filter(
+        keyName => typeof value[keyName] !== propTypes[keyName]
+      );
+      /* eslint-enable valid-typeof */
+      if (divergentKeys.length) {
+        throw Error('Wrong prop types provided for:', JSON.stringify(divergentKeys));
+      }
       this.setState({
         value,
-        jsonString: getJSONString(value),
+        yamlString: yamlStringify(value),
         failed: false,
       });
       onChange(value);
@@ -61,9 +77,10 @@ class ObjectType extends React.Component {
 
   render() {
     const { knob } = this.props;
+
     const { readOnly = false, lineNumbers = false } = knob;
 
-    const { failed, jsonString, key } = this.state;
+    const { failed, yamlString, key } = this.state;
 
     return (
       <CodeMirror
@@ -73,9 +90,9 @@ class ObjectType extends React.Component {
         ref={c => {
           this.input = c;
         }}
-        value={jsonString}
+        value={yamlString}
         onChange={this.handleChange}
-        options={{ mode: { name: 'javascript', json: true }, readOnly, lineNumbers }}
+        options={{ mode: 'yaml', readOnly, lineNumbers }}
       />
     );
   }
@@ -94,7 +111,7 @@ ObjectType.propTypes = {
   onChange: PropTypes.func,
 };
 
-ObjectType.serialize = object => JSON.stringify(object);
-ObjectType.deserialize = value => (value ? JSON.parse(value) : {});
+ObjectType.serialize = object => yamlStringify(object);
+ObjectType.deserialize = value => (value ? yamlParse(value) : {});
 
 export default ObjectType;
