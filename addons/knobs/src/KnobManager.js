@@ -29,10 +29,10 @@ export default class KnobManager {
       ...options,
       name,
     };
-    if (knobInfo.defaultValue === 'undefined') {
+    if (knobInfo.defaultValue === undefined) {
       knobInfo.defaultValue = options.value;
     }
-    if (knobInfo.value === 'undefined') {
+    if (knobInfo.value === undefined) {
       knobInfo.value = options.defaultValue;
     }
 
