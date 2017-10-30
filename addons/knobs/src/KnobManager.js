@@ -25,13 +25,16 @@ export default class KnobManager {
     }
 
     this._mayCallChannel();
-
-    const defaultValue = options.value;
     const knobInfo = {
       ...options,
       name,
-      defaultValue,
     };
+    if (knobInfo.defaultValue === undefined) {
+      knobInfo.defaultValue = options.value;
+    }
+    if (knobInfo.value === undefined) {
+      knobInfo.value = options.defaultValue;
+    }
 
     knobStore.set(name, knobInfo);
     return knobStore.get(name).value;
