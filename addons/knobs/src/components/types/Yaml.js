@@ -35,6 +35,15 @@ class ObjectType extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.input.getCodeMirror().setOption('extraKeys', {
+      Tab(cm) {
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      },
+    });
+  }
+
   componentWillReceiveProps(nextProps) {
     const { value } = this.state;
 
