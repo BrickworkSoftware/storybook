@@ -92,7 +92,7 @@ class ObjectType extends React.Component {
         }}
         value={yamlString}
         onChange={this.handleChange}
-        options={{ mode: 'yaml', readOnly, lineNumbers }}
+        options={{ mode: 'yaml', readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }

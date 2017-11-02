@@ -75,7 +75,7 @@ class ObjectType extends React.Component {
         }}
         value={jsonString}
         onChange={this.handleChange}
-        options={{ mode: { name: 'javascript', json: true }, readOnly, lineNumbers }}
+        options={{ mode: { name: 'javascript', json: true }, readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }

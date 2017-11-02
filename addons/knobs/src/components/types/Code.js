@@ -43,7 +43,7 @@ class CodeType extends React.Component {
         key={this.key}
         value={knob.value}
         onChange={this.handleChange}
-        options={{ mode: knob.mode, readOnly, lineNumbers }}
+        options={{ mode: knob.mode, readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }
