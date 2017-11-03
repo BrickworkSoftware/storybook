@@ -24,7 +24,7 @@ function yamlParse(valueObject) {
   return yaml.safeLoad(valueObject);
 }
 
-class ObjectType extends React.Component {
+class YamlType extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -107,20 +107,20 @@ class ObjectType extends React.Component {
   }
 }
 
-ObjectType.defaultProps = {
+YamlType.defaultProps = {
   knob: {},
   onChange: value => value,
 };
 
-ObjectType.propTypes = {
+YamlType.propTypes = {
   knob: PropTypes.shape({
     name: PropTypes.any,
-    value: PropTypes.object,
+    value: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   }),
   onChange: PropTypes.func,
 };
 
-ObjectType.serialize = object => yamlStringify(object);
-ObjectType.deserialize = value => (value ? yamlParse(value) : {});
+YamlType.serialize = object => yamlStringify(object);
+YamlType.deserialize = value => (value ? yamlParse(value) : {});
 
-export default ObjectType;
+export default YamlType;
