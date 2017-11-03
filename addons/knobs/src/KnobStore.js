@@ -19,7 +19,7 @@ export default class KnobStore {
   set(key, value) {
     this.store[key] = value;
     this.store[key].used = true;
-    this.callbacks.forEach(cb => cb());
+    this.callbacks.forEach(cb => cb(this.store[key]));
   }
 
   get(key) {

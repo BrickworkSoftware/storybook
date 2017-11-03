@@ -47,6 +47,7 @@ export default class Panel extends React.Component {
     this.handleLinkedLabel = this.handleLinkedLabel.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.setKnobs = this.setKnobs.bind(this);
+    this.setKnob = this.setKnob.bind(this);
     this.reset = this.reset.bind(this);
     this.setOptions = this.setOptions.bind(this);
 
@@ -56,6 +57,7 @@ export default class Panel extends React.Component {
     this.lastEdit = getTimestamp();
     this.loadedFromUrl = false;
     this.props.channel.on('addon:knobs:setKnobs', this.setKnobs);
+    this.props.channel.on('addon:knobs:setKnob', this.setKnob);
     this.props.channel.on('addon:knobs:setOptions', this.setOptions);
 
     this.stopListeningOnStory = this.props.api.onStory(() => {
@@ -82,6 +84,18 @@ export default class Panel extends React.Component {
   setKnobs({ knobs, timestamp }) {
     if (!this.options.timestamps || !timestamp || this.lastEdit <= timestamp) {
       this.setState({ knobs });
+    }
+  }
+
+  setKnob({ knob, timestamp }) {
+    const { knobs } = this.state;
+    if (!this.options.timestamps || !timestamp || this.lastEdit <= timestamp) {
+      this.setState({
+        knobs: {
+          ...knobs,
+          [knob.name]: knob,
+        },
+      });
     }
   }
 
@@ -112,9 +126,7 @@ export default class Panel extends React.Component {
 
   render() {
     const { knobs } = this.state;
-    const knobsArray = Object.keys(knobs)
-      .filter(key => knobs[key].used)
-      .map(key => knobs[key]);
+    const knobsArray = Object.keys(knobs).filter(key => knobs[key].used).map(key => knobs[key]);
 
     if (knobsArray.length === 0) {
       return <div style={styles.noKnobs}>NO KNOBS</div>;
