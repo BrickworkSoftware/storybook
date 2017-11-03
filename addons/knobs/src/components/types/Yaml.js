@@ -24,7 +24,7 @@ function yamlParse(valueObject) {
   return yaml.safeLoad(valueObject);
 }
 
-class ObjectType extends React.Component {
+class YamlType extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -33,6 +33,15 @@ class ObjectType extends React.Component {
       value: props.knob.value,
       propTypes: _mapValues(props.knob.value, optionValue => typeof optionValue),
     };
+  }
+
+  componentDidMount() {
+    this.input.getCodeMirror().setOption('extraKeys', {
+      Tab(cm) {
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      },
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -92,26 +101,26 @@ class ObjectType extends React.Component {
         }}
         value={yamlString}
         onChange={this.handleChange}
-        options={{ mode: 'yaml', readOnly, lineNumbers }}
+        options={{ mode: 'yaml', readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }
 }
 
-ObjectType.defaultProps = {
+YamlType.defaultProps = {
   knob: {},
   onChange: value => value,
 };
 
-ObjectType.propTypes = {
+YamlType.propTypes = {
   knob: PropTypes.shape({
     name: PropTypes.any,
-    value: PropTypes.object,
+    value: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   }),
   onChange: PropTypes.func,
 };
 
-ObjectType.serialize = object => yamlStringify(object);
-ObjectType.deserialize = value => (value ? yamlParse(value) : {});
+YamlType.serialize = object => yamlStringify(object);
+YamlType.deserialize = value => (value ? yamlParse(value) : {});
 
-export default ObjectType;
+export default YamlType;

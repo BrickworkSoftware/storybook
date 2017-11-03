@@ -29,6 +29,15 @@ class ObjectType extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.input.getCodeMirror().setOption('extraKeys', {
+      Tab(cm) {
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      },
+    });
+  }
+
   componentWillReceiveProps(nextProps) {
     const { value } = this.state;
 
@@ -75,7 +84,7 @@ class ObjectType extends React.Component {
         }}
         value={jsonString}
         onChange={this.handleChange}
-        options={{ mode: { name: 'javascript', json: true }, readOnly, lineNumbers }}
+        options={{ mode: { name: 'javascript', json: true }, readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }

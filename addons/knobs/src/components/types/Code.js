@@ -13,6 +13,15 @@ class CodeType extends React.Component {
     this.value = props.knob.value;
   }
 
+  componentDidMount() {
+    this.input.getCodeMirror().setOption('extraKeys', {
+      Tab(cm) {
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      },
+    });
+  }
+
   shouldComponentUpdate(nextProps) {
     if (this.value !== nextProps.knob.value) {
       return true;
@@ -40,10 +49,13 @@ class CodeType extends React.Component {
     return (
       <CodeMirror
         id={knob.name}
+        ref={c => {
+          this.input = c;
+        }}
         key={this.key}
         value={knob.value}
         onChange={this.handleChange}
-        options={{ mode: knob.mode, readOnly, lineNumbers }}
+        options={{ mode: knob.mode, readOnly, lineNumbers, tabSize: 2 }}
       />
     );
   }
