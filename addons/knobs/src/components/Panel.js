@@ -88,14 +88,13 @@ export default class Panel extends React.Component {
   }
 
   setKnob({ knob, timestamp }) {
-    const { knobs } = this.state;
     if (!this.options.timestamps || !timestamp || this.lastEdit <= timestamp) {
-      this.setState({
+      this.setState(prevState => ({
         knobs: {
-          ...knobs,
+          ...prevState.knobs,
           [knob.name]: knob,
         },
-      });
+      }));
     }
   }
 
