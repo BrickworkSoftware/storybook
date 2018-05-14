@@ -2,6 +2,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import _isEqual from 'lodash/isEqual';
 import TypeMap from './types';
 
 const InvalidType = () => <span>Invalid Type</span>;
@@ -44,6 +45,14 @@ export default class PropField extends React.Component {
   constructor(props) {
     super(props);
     this._onChange = this.onChange.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const prevProps = this.props;
+    if (_isEqual(nextProps.knob, prevProps.knob)) {
+      return false;
+    }
+    return true;
   }
 
   onChange(e) {

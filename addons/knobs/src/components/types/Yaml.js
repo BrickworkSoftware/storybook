@@ -64,9 +64,12 @@ class YamlType extends React.Component {
     try {
       const value = yamlParse(valueString.trim());
       /* eslint-disable valid-typeof */
-      const divergentKeys = Object.keys(value).filter(
-        keyName => typeof value[keyName] !== propTypes[keyName]
-      );
+      const divergentKeys = Object.keys(value).filter(keyName => {
+        if (propTypes[keyName] !== undefined) {
+          return typeof value[keyName] !== propTypes[keyName];
+        }
+        return false;
+      });
       /* eslint-enable valid-typeof */
       if (divergentKeys.length) {
         throw Error('Wrong prop types provided for:', JSON.stringify(divergentKeys));
